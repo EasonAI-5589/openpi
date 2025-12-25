@@ -89,7 +89,7 @@ src/openpi/
 > - GPU 并行机器人操作仿真器和基准测试平台
 
 ### 3. 架构更改任务
-- [ ] 将当前架构的动作头换成简单的 Flow Matching 头（参照 Pi-Lin 的设计）
+- [ ] 将当前架构的动作头换成简单的 Flow Matching 头（参照 Pi 0 的设计）
 - [ ] 微调参数：当前 loss 是 diffusion loss + a + q loss
 - [ ] 微调 q 使其适配 Flow Matching loss
 
@@ -118,7 +118,7 @@ src/openpi/
 | # | 材料 | 说明 | 状态 |
 |---|------|------|------|
 | 6 | **详细任务说明文档** | 包括修改位置、参数、预期结果 | ⏳ |
-| 7 | **Pi-Lin 的 Flow Matching 设计参考** | 架构任务要用 | ⏳ |
+| 7 | **Pi 0 的 Flow Matching 设计参考** | 架构任务要用 | ⏳ |
 
 ### 依赖关系
 
