@@ -81,7 +81,7 @@ src/openpi/
 
 ### 2. 仿真任务（上手任务）
 - [ ] 完成 6 个在 **ManiSkill** 上的仿真任务
-- [ ] 将 Pi 0 接 MySQL 的仿真 → 换成 Pi 0.5 接 MySQL 的仿真
+- [ ] 将 Pi 0 接 ManiSkill 的仿真 → 换成 Pi 0.5 接 ManiSkill 的仿真
 - [ ] 完成 Pi 0.5 在 ManiSkill Benchmark 的跑分
 
 > **注**：ManySkill/ManyScore 实际上是 **ManiSkill**（SAPIEN Manipulation Skill Framework）
@@ -111,7 +111,7 @@ src/openpi/
 | 2 | **造好的数据集** | 替换官方数据集用 | 在 config 里指向这个数据集路径 | ⏳ |
 | 3 | **Pi 0.5 base 权重** | 你说 12/25 下载完成 | 放到集群上，config 指向这个路径 | ⏳ |
 | 4 | **ManiSkill 仿真代码** | 6 个仿真任务的代码 | 跑通后改成 Pi 0.5 | ⏳ |
-| 5 | **Pi 0 接 MySQL 仿真代码** | 现有的 Pi 0 版本 | 改成 Pi 0.5 版本 | ⏳ |
+| 5 | **Pi 0 接 ManiSkill 仿真代码** | 现有的 Pi 0 版本 | 改成 Pi 0.5 版本 | ⏳ |
 
 ### 建议材料（加速我上手）
 
@@ -131,7 +131,7 @@ src/openpi/
          ↓
     我跑通 6 个仿真任务
          ↓
-云帆提供 Pi0 接 MySQL 代码
+云帆提供 Pi0 接 ManiSkill 代码
          ↓
     我改成 Pi0.5 版本并跑分
 ```
