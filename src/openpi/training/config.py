@@ -20,6 +20,7 @@ import openpi.models.tokenizer as _tokenizer
 import openpi.policies.aloha_policy as aloha_policy
 import openpi.policies.droid_policy as droid_policy
 import openpi.policies.libero_policy as libero_policy
+import openpi.policies.maniskill_policy as maniskill_policy
 import openpi.shared.download as _download
 import openpi.shared.normalize as _normalize
 import openpi.training.droid_rlds_dataset as droid_rlds_dataset
@@ -964,6 +965,59 @@ _CONFIGS = [
         overwrite=True,
         exp_name="debug_pi05",
         wandb_enabled=False,
+    ),
+    #
+    # ManiSkill configs for Pi0.5 simulation evaluation.
+    #
+    TrainConfig(
+        name="pi05_maniskill",
+        model=pi0_config.Pi0Config(
+            pi05=True,
+            action_dim=32,  # Pi0.5 uses 32-dim actions
+            action_horizon=50,  # 50-step action chunks
+        ),
+        data=SimpleDataConfig(
+            assets=AssetsConfig(
+                # Use local ManiSkill assets (identity normalization)
+                assets_dir="checkpoints/pi05_base_hf/assets",
+                asset_id="maniskill",
+            ),
+            data_transforms=lambda model: _transforms.Group(
+                inputs=[maniskill_policy.ManiSkillInputs(model_type=ModelType.PI05)],
+                outputs=[maniskill_policy.ManiSkillOutputs()],
+            ),
+            base_config=DataConfig(
+                repo_id="maniskill",
+                prompt_from_task=True,
+            ),
+        ),
+        # Load from HuggingFace checkpoint (local path)
+        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_base_hf"),
+    ),
+    TrainConfig(
+        name="pi05_maniskill_droid",
+        model=pi0_config.Pi0Config(
+            pi05=True,
+            action_dim=32,
+            action_horizon=50,
+        ),
+        data=SimpleDataConfig(
+            assets=AssetsConfig(
+                # Use local ManiSkill assets
+                assets_dir="checkpoints/pi05_droid_hf/assets",
+                asset_id="maniskill",
+            ),
+            data_transforms=lambda model: _transforms.Group(
+                inputs=[maniskill_policy.ManiSkillInputs(model_type=ModelType.PI05)],
+                outputs=[maniskill_policy.ManiSkillOutputs()],
+            ),
+            base_config=DataConfig(
+                repo_id="maniskill",
+                prompt_from_task=True,
+            ),
+        ),
+        # Use DROID-finetuned checkpoint
+        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_droid_hf"),
     ),
     # RoboArena & PolaRiS configs.
     *roboarena_config.get_roboarena_configs(),

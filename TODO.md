@@ -92,6 +92,35 @@ src/openpi/
 
 **结论**：openpi 官方**不直接支持 ManiSkill**，只支持 LIBERO、ALOHA Sim、DROID。
 
+**✅ 已完成 Pi0.5 + ManiSkill3 集成**（2025-12-27）
+
+**集成架构**：
+```
+ManiSkill3 环境 (PickCube-v1, StackCube-v1, etc.)
+    ↓ (obs: RGBD + qpos/qvel)
+ManiSkillInputs Transform (src/openpi/policies/maniskill_policy.py)
+    ↓ (转换为 Pi0.5 输入格式: image dict + state)
+Pi0.5 Model Inference
+    ↓ (50-step action chunks, 32-dim)
+ManiSkillOutputs Transform
+    ↓ (转换为 7D actions: dx, dy, dz, dax, day, daz, gripper)
+ManiSkill3 env.step()
+```
+
+**新增文件**：
+- `src/openpi/policies/maniskill_policy.py` - ManiSkill transforms
+- `src/openpi/maniskill/pi05_maniskill_adapter.py` - 适配器（备用）
+- `src/openpi/maniskill/pi05_maniskill_evaluator.py` - 评估循环
+- `scripts/test_maniskill_integration.py` - 测试脚本
+- `src/openpi/training/config.py` - 新增 `pi05_maniskill` 和 `pi05_maniskill_droid` 配置
+
+**评估结果**：
+| 环境 | 模型 | 成功率 | 平均步数 | 平均奖励 |
+|------|------|--------|----------|----------|
+| PickCube-v1 | pi05_maniskill | 0% | 50.0 | 1.63 |
+
+**注意**：base 模型未针对 ManiSkill 任务微调，低成功率是预期的。需要在 ManiSkill 任务示范上微调以获得更好效果。
+
 **可参考的集成方案**：
 
 | 项目 | 说明 | 链接 |
@@ -99,17 +128,6 @@ src/openpi/
 | **open-pi-zero** | Pi0 重实现，支持 SimplerEnv + ManiSkill2 | https://github.com/allenzren/open-pi-zero |
 | **SimplerEnv** | Real2Sim 评估框架，包含 ManiSkill2_real2sim | https://github.com/DelinQu/SimplerEnv-OpenVLA |
 | **VLABench** | VLA 评估基准，支持 Pi0/Pi0.5 | https://github.com/OpenMOSS/VLABench |
-
-**集成架构**：
-```
-ManiSkill3 环境
-    ↓ (obs: RGBD + state)
-SimplerEnv 适配层（需要开发）
-    ↓ (转换为 VLA 输入格式)
-OpenPI Policy Server
-    ↓ (actions)
-ManiSkill3 执行
-```
 
 **待确认**：问云帆他们用的是什么集成方案？
 

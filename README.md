@@ -321,3 +321,37 @@ We will collect common issues and their solutions here. If you encounter an issu
 | Import errors when running examples       | Make sure you've installed all dependencies with `uv sync`. Some examples may have additional requirements listed in their READMEs.                    |
 | Action dimensions mismatch                | Verify your data processing transforms match the expected input/output dimensions of your robot. Check the action space definitions in your policy classes.                                  |
 | Diverging training loss                            | Check the `q01`, `q99`, and `std` values in `norm_stats.json` for your dataset. Certain dimensions that are rarely used can end up with very small `q01`, `q99`, or `std` values, leading to huge states and actions after normalization. You can manually adjust the norm stats as a workaround. |
+
+## ManiSkill3 Integration (Experimental)
+
+This fork includes experimental support for evaluating Pi0.5 models on [ManiSkill3](https://github.com/haosulab/ManiSkill) simulation environments.
+
+### Quick Start
+
+```bash
+# Install ManiSkill3
+pip install mani-skill
+
+# Run evaluation on PickCube-v1
+python scripts/test_maniskill_integration.py --run-eval
+```
+
+### Configuration
+
+Two configs are provided for ManiSkill evaluation:
+- `pi05_maniskill`: Uses the pi05_base checkpoint
+- `pi05_maniskill_droid`: Uses the pi05_droid checkpoint (DROID-finetuned)
+
+### Evaluation Results (2025-12-27)
+
+| Environment | Model | Success Rate | Avg Steps | Avg Reward |
+|-------------|-------|--------------|-----------|------------|
+| PickCube-v1 | pi05_maniskill | 0% | 50.0 | 1.63 |
+
+**Note**: The base model is not trained on ManiSkill tasks, so low success rates are expected. For better results, fine-tune the model on ManiSkill task demonstrations.
+
+### Key Files
+
+- `src/openpi/policies/maniskill_policy.py` - Input/output transforms for ManiSkill
+- `src/openpi/maniskill/` - ManiSkill adapter and evaluator
+- `scripts/test_maniskill_integration.py` - Test script for integration
