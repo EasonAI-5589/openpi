@@ -195,7 +195,29 @@ ManiSkill3 执行
 - [x] **配置 HuggingFace 镜像**（hf-mirror.com）加速下载
 - [x] **下载 pi05_base 模型** → `checkpoints/pi05_base_hf/` (14GB)
 - [x] **下载 pi05_droid 模型** → `checkpoints/pi05_droid_hf/` (6.8GB)
-- [ ] 运行 Simple Client 推理测试
+- [x] **pi05_base PyTorch 推理测试成功** ✅
+
+#### 推理测试结果（2025-12-27）
+
+**pi05_base 模型推理成功**：
+
+| 指标 | 结果 |
+|------|------|
+| 动作形状 | `[1, 50, 32]` (batch=1, chunk=50步, dim=32维) |
+| 动作范围 | `[-0.26, 0.56]` |
+| 显存使用 | **14.49 GB** |
+| 峰值显存 | **14.83 GB** |
+| 首次推理耗时 | ~7分钟（Triton 自动调优内核） |
+
+**注意事项**：
+1. 首次推理较慢是正常的 - PyTorch/Triton 在进行 AUTOTUNE
+2. 后续推理会快很多（内核已缓存）
+3. 需要安装 `transformers_replace`：
+   ```bash
+   TRANSFORMERS_PATH=$(python -c "import transformers; print(transformers.__path__[0])")
+   cp -r ./src/openpi/models_pytorch/transformers_replace/* "$TRANSFORMERS_PATH/"
+   ```
+4. Weight tying：`embed_tokens = lm_head.weight`（HF 模型需要手动处理）
 
 #### 模型下载说明（2025-12-27）
 
