@@ -192,9 +192,44 @@ ManiSkill3 执行
 - [x] 配置商庄服务器环境（Conda + 代理）
 - [x] 部署 openpi 环境（PyTorch 2.7.1 + JAX 0.5.3）
 - [x] 调研 ManiSkill 集成方案 → 官方不支持，需要 SimplerEnv 适配层
-- [ ] 下载 pi05_droid 模型（进行中）
-- [ ] 下载 pi05_base 模型（进行中）
+- [x] **配置 HuggingFace 镜像**（hf-mirror.com）加速下载
+- [x] **下载 pi05_base 模型** → `checkpoints/pi05_base_hf/` (14GB)
+- [x] **下载 pi05_droid 模型** → `checkpoints/pi05_droid_hf/` (6.8GB)
 - [ ] 运行 Simple Client 推理测试
+
+#### 模型下载说明（2025-12-27）
+
+**问题**：GCS (Google Cloud Storage) 下载速度极慢（~240KB/s）
+
+**解决方案**：使用 HuggingFace 镜像（hf-mirror.com）
+
+```bash
+# 配置 HuggingFace 镜像
+export HF_ENDPOINT="https://hf-mirror.com"
+
+# 下载模型（使用 PyTorch 格式）
+from huggingface_hub import snapshot_download
+snapshot_download('lerobot/pi05_base', local_dir='checkpoints/pi05_base_hf')
+snapshot_download('s3y/pi05_droid_pytorch', local_dir='checkpoints/pi05_droid_hf')
+```
+
+**下载速度对比**：
+| 来源 | 速度 | 21GB 下载时间 |
+|------|------|---------------|
+| GCS | ~240KB/s | ~25小时 |
+| HF 镜像 | ~30MB/s | **~12分钟** |
+
+**模型路径**：
+```
+checkpoints/
+├── pi05_base_hf/           # 14GB
+│   ├── model.safetensors
+│   ├── config.json
+│   └── ...
+└── pi05_droid_hf/          # 6.8GB
+    ├── model.safetensors
+    ├── config.json
+    └── ...
 
 ---
 
