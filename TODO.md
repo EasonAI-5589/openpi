@@ -88,6 +88,31 @@ src/openpi/
 > - GitHub: https://github.com/haosulab/ManiSkill
 > - GPU 并行机器人操作仿真器和基准测试平台
 
+#### ManiSkill 集成调研（2025-12-27）
+
+**结论**：openpi 官方**不直接支持 ManiSkill**，只支持 LIBERO、ALOHA Sim、DROID。
+
+**可参考的集成方案**：
+
+| 项目 | 说明 | 链接 |
+|------|------|------|
+| **open-pi-zero** | Pi0 重实现，支持 SimplerEnv + ManiSkill2 | https://github.com/allenzren/open-pi-zero |
+| **SimplerEnv** | Real2Sim 评估框架，包含 ManiSkill2_real2sim | https://github.com/DelinQu/SimplerEnv-OpenVLA |
+| **VLABench** | VLA 评估基准，支持 Pi0/Pi0.5 | https://github.com/OpenMOSS/VLABench |
+
+**集成架构**：
+```
+ManiSkill3 环境
+    ↓ (obs: RGBD + state)
+SimplerEnv 适配层（需要开发）
+    ↓ (转换为 VLA 输入格式)
+OpenPI Policy Server
+    ↓ (actions)
+ManiSkill3 执行
+```
+
+**待确认**：问云帆他们用的是什么集成方案？
+
 ### 3. 架构更改任务
 - [ ] 将当前架构的动作头换成简单的 Flow Matching 头（参照 Pi 0 的设计）
 - [ ] 微调参数：当前 loss 是 diffusion loss + a + q loss
@@ -162,6 +187,14 @@ src/openpi/
 - [x] 创建 TODO.md 任务清单
 - [x] 调研 Pi0 → Pi0.5 迁移方案
 - [x] 确认 ManiSkill 基准测试平台
+
+### 2025-12-27
+- [x] 配置商庄服务器环境（Conda + 代理）
+- [x] 部署 openpi 环境（PyTorch 2.7.1 + JAX 0.5.3）
+- [x] 调研 ManiSkill 集成方案 → 官方不支持，需要 SimplerEnv 适配层
+- [ ] 下载 pi05_droid 模型（进行中）
+- [ ] 下载 pi05_base 模型（进行中）
+- [ ] 运行 Simple Client 推理测试
 
 ---
 
