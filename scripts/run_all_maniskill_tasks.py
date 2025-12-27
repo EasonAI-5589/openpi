@@ -31,7 +31,7 @@ MANISKILL_TASKS = [
     "PegInsertionSide-v1",
     "PlugCharger-v1",
     "PushCube-v1",
-    # "TurnFaucet-v1",  # Requires partnet_mobility assets
+    "TurnFaucet-v1",  # Now available after downloading partnet_mobility assets
 ]
 
 TASK_INSTRUCTIONS = {

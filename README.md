@@ -344,7 +344,7 @@ Two configs are provided for ManiSkill evaluation:
 
 ### Evaluation Results (2025-12-27)
 
-Zero-shot evaluation on 5 ManiSkill3 tasks (10 episodes each, 200 max steps):
+Zero-shot evaluation on 6 ManiSkill3 tasks (10 episodes each, 200 max steps):
 
 | Environment | Success Rate | Avg Steps | Avg Reward | Notes |
 |-------------|--------------|-----------|------------|-------|
@@ -353,8 +353,9 @@ Zero-shot evaluation on 5 ManiSkill3 tasks (10 episodes each, 200 max steps):
 | PegInsertionSide-v1 | 0% | 100.0 | 0.37 | Precision insertion |
 | PlugCharger-v1 | 0% | 200.0 | 0.00 | Plug manipulation |
 | PushCube-v1 | 0% | 50.0 | 2.24 | Push to target |
+| TurnFaucet-v1 | 0% | 200.0 | 0.00 | Articulated object |
 
-**Total evaluation time**: ~10 minutes on H100 GPU
+**Total evaluation time**: ~12 minutes on H100 GPU
 
 **Note**: The base Pi0.5 model is trained on real-world DROID/OXE data, not ManiSkill simulation. Zero-shot transfer to simulation is challenging due to:
 - Domain gap between real and simulated observations
@@ -368,7 +369,7 @@ For better performance, fine-tune on ManiSkill task demonstrations using the pro
 To run evaluation on all supported ManiSkill tasks:
 
 ```bash
-# Run all tasks (PickCube, StackCube, PegInsertion, PlugCharger, PushCube)
+# Run all 6 tasks (PickCube, StackCube, PegInsertion, PlugCharger, PushCube, TurnFaucet)
 python scripts/run_all_maniskill_tasks.py
 
 # Run individual tests
