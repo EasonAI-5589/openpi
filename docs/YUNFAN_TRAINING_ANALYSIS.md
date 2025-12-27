@@ -2,6 +2,81 @@
 
 > 分析云帆的 Pi0 + ManiSkill 训练方案，为 Pi0.5 迁移提供参考
 
+---
+
+## 0. 核心概念：什么是 SFT 后训练
+
+### 0.1 术语解释
+
+| 术语 | 含义 | 我们做的 |
+|------|------|----------|
+| 预训练 (Pre-training) | 在大规模数据上从零训练 | ❌ 不是 |
+| 后训练 (Post-training) | 在预训练模型基础上继续训练 | ✅ 是 |
+| SFT (Supervised Fine-Tuning) | 后训练的一种，用监督数据微调 | ✅ 就是这个 |
+| RLHF/RL | 后训练的另一种，用强化学习 | ❌ 目前不是 |
+
+**SFT = 监督微调 = 后训练的一种方式**
+
+### 0.2 训练流程
+
+```
+Pi0/Pi0.5 预训练模型 (Physical Intelligence 提供，在真实机器人数据上训练)
+        ↓
+   SFT 微调 (用 ManiSkill 仿真环境的 demo 数据)
+        ↓
+微调后的模型 (能在 ManiSkill 仿真中执行任务)
+```
+
+### 0.3 为什么 Zero-shot 不行
+
+- Pi0/Pi0.5 的预训练数据是**真实机器人数据**（DROID、Bridge 等）
+- ManiSkill 是**仿真环境**，视觉外观、渲染风格都不同
+- 模型没见过 ManiSkill 的数据分布，所以 zero-shot 成功率是 **0%**
+
+### 0.4 数据格式
+
+**ManiSkill Demo 数据**：专家演示轨迹，由脚本/人类控制机器人完成任务录制
+
+```
+数据位置: /share/project/zooy/mani_data/StackCube-v1/trajectory.h5
+
+每条轨迹包含:
+├── obs/
+│   ├── sensor_data/
+│   │   ├── base_camera/Color  # RGB 图像 (256x256x4)
+│   │   └── hand_camera/Color  # 腕部相机 (如果有)
+│   └── agent/
+│       └── qpos               # 机器人关节位置 (9维，取前8维)
+└── actions                    # 专家动作 (7维: 6D pose + gripper)
+```
+
+### 0.5 模型输入输出
+
+**训练/推理时的输入**：
+
+| 输入 | 维度 | 说明 |
+|------|------|------|
+| `image` | (256, 256, 3) | 基座相机 RGB |
+| `wrist_image` | (256, 256, 3) | 腕部相机 RGB (可选，无则填零) |
+| `state` | (8,) | 机器人状态 (qpos[:8]) |
+| `prompt` | str | 任务指令，如 "Pick up a red cube and stack it..." |
+
+**训练/推理时的输出**：
+
+| 输出 | 维度 | 说明 |
+|------|------|------|
+| `actions` | (horizon, 7) | 预测的动作序列 |
+
+动作 7 维 = `[dx, dy, dz, droll, dpitch, dyaw, gripper]` (delta pose + 夹爪)
+
+### 0.6 训练 Loss
+
+```
+Loss = Diffusion Loss (预测动作 vs 专家动作)
+```
+
+---
+
 ## 1. 云帆的仓库结构
 
 ```
