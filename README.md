@@ -344,6 +344,8 @@ Two configs are provided for ManiSkill evaluation:
 
 ### Evaluation Results (2025-12-27)
 
+#### Quick Evaluation (10 episodes each)
+
 Zero-shot evaluation on 6 ManiSkill3 tasks (10 episodes each, 200 max steps):
 
 | Environment | Success Rate | Avg Steps | Avg Reward | Notes |
@@ -355,7 +357,27 @@ Zero-shot evaluation on 6 ManiSkill3 tasks (10 episodes each, 200 max steps):
 | PushCube-v1 | 0% | 50.0 | 2.24 | Push to target |
 | TurnFaucet-v1 | 0% | 200.0 | 0.00 | Articulated object |
 
-**Total evaluation time**: ~12 minutes on H100 GPU
+**Evaluation time**: ~12 minutes on H100 GPU
+
+#### Multi-Seed Evaluation (40 episodes each)
+
+Following the evaluation protocol from Pi0 benchmarks, we ran 40 episodes per task:
+
+| Task | Pi0.5 (ours) | Pi0 (云帆) |
+|------|--------------|------------|
+| PickCube-v1 | 0/40 = 0.00% | 1/40 = 2.50% |
+| StackCube-v1 | 0/40 = 0.00% | 24/40 = 60.00% |
+| PushCube-v1 | 0/40 = 0.00% | 28/40 = 70.00% |
+| PegInsertionSide-v1 | 0/40 = 0.00% | N/A |
+| PlugCharger-v1 | 0/40 = 0.00% | N/A |
+| TurnFaucet-v1 | 0/40 = 0.00% | N/A |
+
+**Evaluation time**: ~23 minutes on H100 GPU
+
+Run the multi-seed evaluation:
+```bash
+python scripts/run_multiseed_eval.py
+```
 
 **Note**: The base Pi0.5 model is trained on real-world DROID/OXE data, not ManiSkill simulation. Zero-shot transfer to simulation is challenging due to:
 - Domain gap between real and simulated observations
