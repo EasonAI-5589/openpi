@@ -1,0 +1,58 @@
+{
+  "timestamp": "20251227_124038",
+  "total_time_seconds": 626.966171503067,
+  "num_tasks": 5,
+  "configuration": {
+    "num_episodes": 10,
+    "max_steps": 200,
+    "model_config": "pi05_maniskill",
+    "checkpoint": "pi05_base_hf"
+  },
+  "results": {
+    "PickCube-v1": {
+      "success_rate": 0.0,
+      "num_success": 0,
+      "num_episodes": 10,
+      "avg_steps": 50.0,
+      "avg_reward": 1.4548342887079344,
+      "env_name": "PickCube-v1",
+      "model_config": "pi05_maniskill"
+    },
+    "StackCube-v1": {
+      "success_rate": 0.0,
+      "num_success": 0,
+      "num_episodes": 10,
+      "avg_steps": 50.0,
+      "avg_reward": 1.9275737419724464,
+      "env_name": "StackCube-v1",
+      "model_config": "pi05_maniskill"
+    },
+    "PegInsertionSide-v1": {
+      "success_rate": 0.0,
+      "num_success": 0,
+      "num_episodes": 10,
+      "avg_steps": 100.0,
+      "avg_reward": 0.36998596091637526,
+      "env_name": "PegInsertionSide-v1",
+      "model_config": "pi05_maniskill"
+    },
+    "PlugCharger-v1": {
+      "success_rate": 0.0,
+      "num_success": 0,
+      "num_episodes": 10,
+      "avg_steps": 200.0,
+      "avg_reward": 0.0,
+      "env_name": "PlugCharger-v1",
+      "model_config": "pi05_maniskill"
+    },
+    "PushCube-v1": {
+      "success_rate": 0.0,
+      "num_success": 0,
+      "num_episodes": 10,
+      "avg_steps": 50.0,
+      "avg_reward": 2.2412315145134927,
+      "env_name": "PushCube-v1",
+      "model_config": "pi05_maniskill"
+    }
+  }
+}

@@ -344,14 +344,44 @@ Two configs are provided for ManiSkill evaluation:
 
 ### Evaluation Results (2025-12-27)
 
-| Environment | Model | Success Rate | Avg Steps | Avg Reward |
-|-------------|-------|--------------|-----------|------------|
-| PickCube-v1 | pi05_maniskill | 0% | 50.0 | 1.63 |
+Zero-shot evaluation on 5 ManiSkill3 tasks (10 episodes each, 200 max steps):
 
-**Note**: The base model is not trained on ManiSkill tasks, so low success rates are expected. For better results, fine-tune the model on ManiSkill task demonstrations.
+| Environment | Success Rate | Avg Steps | Avg Reward | Notes |
+|-------------|--------------|-----------|------------|-------|
+| PickCube-v1 | 0% | 50.0 | 1.45 | Cube manipulation |
+| StackCube-v1 | 0% | 50.0 | 1.93 | Stack cubes |
+| PegInsertionSide-v1 | 0% | 100.0 | 0.37 | Precision insertion |
+| PlugCharger-v1 | 0% | 200.0 | 0.00 | Plug manipulation |
+| PushCube-v1 | 0% | 50.0 | 2.24 | Push to target |
+
+**Total evaluation time**: ~10 minutes on H100 GPU
+
+**Note**: The base Pi0.5 model is trained on real-world DROID/OXE data, not ManiSkill simulation. Zero-shot transfer to simulation is challenging due to:
+- Domain gap between real and simulated observations
+- Different robot embodiment (DROID vs Franka Panda)
+- Different action space conventions
+
+For better performance, fine-tune on ManiSkill task demonstrations using the provided training pipeline.
+
+### Running Full Evaluation
+
+To run evaluation on all supported ManiSkill tasks:
+
+```bash
+# Run all tasks (PickCube, StackCube, PegInsertion, PlugCharger, PushCube)
+python scripts/run_all_maniskill_tasks.py
+
+# Run individual tests
+python scripts/test_maniskill_integration.py --test-env      # Test environment only
+python scripts/test_maniskill_integration.py --test-model    # Test model loading
+python scripts/test_maniskill_integration.py --run-eval      # Run single task evaluation
+```
+
+Results are saved to `./evaluation_results/` in JSON and Markdown format.
 
 ### Key Files
 
 - `src/openpi/policies/maniskill_policy.py` - Input/output transforms for ManiSkill
 - `src/openpi/maniskill/` - ManiSkill adapter and evaluator
+- `scripts/run_all_maniskill_tasks.py` - Run evaluation on all tasks
 - `scripts/test_maniskill_integration.py` - Test script for integration
