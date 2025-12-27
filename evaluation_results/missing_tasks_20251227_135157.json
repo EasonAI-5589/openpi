@@ -1,0 +1,41 @@
+{
+  "timestamp": "20251227_135157",
+  "model": "pi05_base",
+  "total_time_minutes": 8.394595118363698,
+  "episodes_per_task": 40,
+  "max_steps": 200,
+  "results": {
+    "PlaceSphere-v1": {
+      "success_rate": 0.0,
+      "num_success": 0,
+      "num_episodes": 40,
+      "avg_steps": 50.0,
+      "avg_reward": 1.6517645044430993,
+      "env_name": "PlaceSphere-v1",
+      "model_config": "pi05_maniskill"
+    },
+    "PullCube-v1": {
+      "success_rate": 0.0,
+      "num_success": 0,
+      "num_episodes": 40,
+      "avg_steps": 50.0,
+      "avg_reward": 2.971408808728006,
+      "env_name": "PullCube-v1",
+      "model_config": "pi05_maniskill"
+    },
+    "PullCubeTool-v1": {
+      "success_rate": 0.0,
+      "num_success": 0,
+      "num_episodes": 40,
+      "avg_steps": 100.0,
+      "avg_reward": 1.7240036132297027,
+      "env_name": "PullCubeTool-v1",
+      "model_config": "pi05_maniskill"
+    }
+  },
+  "yunfan_pi0_results": {
+    "PlaceSphere-v1": "11/40 = 27.50%",
+    "PullCube-v1": "35/40 = 87.50%",
+    "PullCubeTool-v1": "3/40 = 7.50%"
+  }
+}

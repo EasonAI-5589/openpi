@@ -188,27 +188,183 @@ Legend: [✓] = 云帆 Pi0 已评估  [ ] = 未评估
 
 | Task | Pi0.5 (ours) | Pi0 (云帆) |
 |------|--------------|------------|
-| PlaceSphere-v1 | 待补跑 | 11/40 = 27.50% |
+| PlaceSphere-v1 | 0/40 = 0.00% | 11/40 = 27.50% |
 | PickCube-v1 | 0/40 = 0.00% | 1/40 = 2.50% |
 | StackCube-v1 | 0/40 = 0.00% | 24/40 = 60.00% |
 | PushCube-v1 | 0/40 = 0.00% | 28/40 = 70.00% |
-| PullCube-v1 | 待补跑 | 35/40 = 87.50% |
-| PullCubeTool-v1 | 待补跑 | 3/40 = 7.50% |
+| PullCube-v1 | 0/40 = 0.00% | 35/40 = 87.50% |
+| PullCubeTool-v1 | 0/40 = 0.00% | 3/40 = 7.50% |
 | PegInsertionSide-v1 | 0/40 = 0.00% | N/A |
 | PlugCharger-v1 | 0/40 = 0.00% | N/A |
 | TurnFaucet-v1 | 0/40 = 0.00% | N/A |
 
 **注意**：base 模型未针对 ManiSkill 任务微调，低成功率是预期的。需要在 ManiSkill 任务示范上微调以获得更好效果。
 
+---
+
+### 🔬 0% 成功率诊断分析（2025-12-27）
+
+**问题**：Pi0.5 在 ManiSkill3 上的成功率始终为 0%，而云帆的 Pi0 能达到 60-87.5%。
+
+#### 诊断脚本
+- `scripts/debug_action_space.py` - 分析 action 范围和 magnitude
+- `scripts/debug_observation.py` - 分析 observation 对齐问题
+
+#### 诊断结论
+
+**1. Gripper 始终打开（核心问题！）**
+```
+Gripper values: min=-1.0000, max=-1.0000
+Unique gripper values: [-1.]
+```
+- Pi0.5 输出的 gripper 始终是 -1（打开状态）
+- PickCube 等任务需要 gripper=1（闭合）才能抓取
+- **这是 0% 成功率的直接原因！**
+
+**2. State 不对齐**
+```
+Pi0.5 期望 (DROID 格式):          ManiSkill 提供:
+- EEF pose (7D: xyz + quat)       - Joint positions (9D: qpos)
+- Gripper state                    - Joint velocities (9D: qvel)
+- 3 个相机视角                     - 1-2 个相机视角
+```
+- Pi0.5 训练数据使用 **EEF pose**（末端执行器位姿）
+- 我们给的是 **Joint positions**（关节角度）
+- 模型完全不理解输入的含义！
+
+**3. 好消息：ManiSkill 提供了 EEF pose**
+```python
+obs["extra"]["tcp_pose"]  # tensor shape=[1, 7] (xyz + quaternion)
+```
+但我们没有使用它！
+
+**4. Action 范围看起来正常**
+- Mean action magnitude = 0.303（在 [-1, 1] 范围内合理）
+- 不是 action scale 的问题
+
+#### 解决方案
+
+**方案 A：修改 State 输入（推荐）**
+```python
+# 在 ManiSkillInputs transform 中：
+# 现在：使用 qpos + qvel (18D)
+state = np.concatenate([qpos, qvel])
+
+# 改为：使用 tcp_pose + gripper (8D)
+tcp_pose = obs["extra"]["tcp_pose"]  # 7D
+gripper_state = obs["agent"]["qpos"][:, 7:9].mean()  # 1D
+state = np.concatenate([tcp_pose, [gripper_state]])
+```
+
+**方案 B：在 ManiSkill 数据上微调**
+- 收集 ManiSkill 上的专家轨迹
+- 使用 ManiSkill 的 observation 格式微调 Pi0.5
+- 这是云帆 Pi0 成功的原因！
+
+**方案 C：使用不同的 control mode**
+```python
+# 现在：pd_ee_delta_pose (7D delta)
+# 可尝试：pd_joint_delta_pos (关节空间 delta)
+```
+
+#### 下一步行动
+
+1. [ ] **修改 ManiSkillInputs transform** - 使用 tcp_pose 替代 qpos
+2. [ ] **测试修复后的成功率**
+3. [x] **分析云帆的代码** - 找到他们的实现细节
+
+---
+
+### 🔍 云帆代码分析结果（2025-12-27）
+
+**代码位置**：`/share/project/yunfan/RL/caurft/`
+
+#### 关键发现 1：云帆使用微调后的模型！
+
+云帆的代码是一个**完整的 RL 微调框架**（CalQL + Pi0），不是直接用 base 模型评估！
+
+```
+/share/project/yunfan/RL/caurft/
+├── openpi/                     # 修改过的 openpi（加了 ManiSkill 支持）
+├── example/
+│   └── train_main_sim.py      # 主训练脚本（79KB！非常复杂）
+└── jaxrl_m/
+    └── envs/maniskill.py      # ManiSkill Wrapper
+```
+
+**训练流程**：
+1. 离线预训练（CalQL on demo data）
+2. 在线微调（RL + demo 混合）
+3. 评估
+
+#### 关键发现 2：State 格式
+
+云帆的代码**确实使用了 qpos 前 8 维**，但他们是在**微调数据**中统一了这个格式：
+
+```python
+# 云帆的 convert_maniskill_data_to_lerobot.py
+"state": qpos[t, :8],  # Take first 8 dimensions
+"actions": actions[t],  # shape: (7,)
+```
+
+评估脚本也使用同样的格式：
+```python
+# 云帆的 eval_maniskill.py
+state8 = np.asarray(qpos[:8], dtype=np.float32)
+```
+
+#### 关键发现 3：LiberoInputs Transform
+
+云帆的配置使用 `LeRobotManiskillDataConfig`，它复用了 `LiberoInputs`：
+```python
+data_transforms = _transforms.Group(
+    inputs=[libero_policy.LiberoInputs(model_type=model_config.model_type)],
+    outputs=[libero_policy.LiberoOutputs()],
+)
+```
+
+LiberoInputs 期望的输入格式：
+- `observation/state`: 8D float32（前 8 维 qpos）
+- `observation/image`: base camera RGB
+- `observation/wrist_image`: wrist camera RGB（如果没有就用 zeros）
+
+#### 关键发现 4：评估脚本
+
+云帆有专门的评估脚本：
+```bash
+python /share/project/yunfan/RL/caurft/openpi/scripts/eval_maniskill.py \
+    --config-name pi0_maniskill \
+    --checkpoint-dir /path/to/trained/checkpoint \
+    --env-id StackCube-v1 \
+    --num-episodes 40
+```
+
+#### 为什么云帆成功率高？
+
+| 因素 | 我们（Pi0.5 base） | 云帆（Pi0 微调） |
+|------|-------------------|-----------------|
+| 模型 | 未微调的 base 模型 | 在 ManiSkill 示范上微调 |
+| 训练 | 无 | CalQL + RL 在线微调 |
+| 数据 | 无 ManiSkill 数据 | 使用 ManiSkill 专家轨迹 |
+| State | 我们用 18D (qpos+qvel) | 他们用 8D (qpos[:8]) |
+
+**结论**：云帆的高成功率来自于**在 ManiSkill 数据上微调**，而不是 zero-shot！
+
+#### 下一步行动（更新）
+
+1. [ ] **统一 State 格式为 8D** - 与云帆一致
+2. [ ] **收集 ManiSkill 专家数据** - 用于微调
+3. [ ] **参考云帆的训练流程** - CalQL + Pi0 微调
+4. [ ] **对比 zero-shot vs fine-tuned** - 理解差距来源
+
 **可参考的集成方案**：
 
 | 项目 | 说明 | 链接 |
 |------|------|------|
+| **云帆的 caurft** | CalQL + Pi0 + ManiSkill 微调 | `/share/project/yunfan/RL/caurft/` |
 | **open-pi-zero** | Pi0 重实现，支持 SimplerEnv + ManiSkill2 | https://github.com/allenzren/open-pi-zero |
 | **SimplerEnv** | Real2Sim 评估框架，包含 ManiSkill2_real2sim | https://github.com/DelinQu/SimplerEnv-OpenVLA |
 | **VLABench** | VLA 评估基准，支持 Pi0/Pi0.5 | https://github.com/OpenMOSS/VLABench |
-
-**待确认**：问云帆他们用的是什么集成方案？
 
 ### 3. 架构更改任务
 - [ ] 将当前架构的动作头换成简单的 Flow Matching 头（参照 Pi 0 的设计）

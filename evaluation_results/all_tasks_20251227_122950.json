@@ -1,0 +1,43 @@
+{
+  "timestamp": "20251227_122950",
+  "total_time_seconds": 0.8692371845245361,
+  "num_tasks": 5,
+  "configuration": {
+    "num_episodes": 10,
+    "max_steps": 200,
+    "model_config": "pi05_maniskill",
+    "checkpoint": "pi05_base_hf"
+  },
+  "results": {
+    "PickCube-v1": {
+      "env_name": "PickCube-v1",
+      "error": "No results found in output",
+      "success_rate": 0.0,
+      "num_episodes": 0
+    },
+    "StackCube-v1": {
+      "env_name": "StackCube-v1",
+      "error": "No results found in output",
+      "success_rate": 0.0,
+      "num_episodes": 0
+    },
+    "PegInsertionSide-v1": {
+      "env_name": "PegInsertionSide-v1",
+      "error": "No results found in output",
+      "success_rate": 0.0,
+      "num_episodes": 0
+    },
+    "PlugCharger-v1": {
+      "env_name": "PlugCharger-v1",
+      "error": "No results found in output",
+      "success_rate": 0.0,
+      "num_episodes": 0
+    },
+    "PushCube-v1": {
+      "env_name": "PushCube-v1",
+      "error": "No results found in output",
+      "success_rate": 0.0,
+      "num_episodes": 0
+    }
+  }
+}
