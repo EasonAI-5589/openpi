@@ -10,18 +10,20 @@
 
 ### 1. 基础配置修改
 - [x] 查找 Pi 0.5 的 config 文件 → `src/openpi/training/config.py`
-- [ ] 基于娄云帆共享的 config 进行修改
+- [x] 基于娄云帆共享的 config 进行修改 ✅
 - [x] 对比官方仓库的改动处
-- [ ] 将数据集替换成娄云帆造好的数据集
+- [x] 将数据集替换成娄云帆造好的数据集 (使用相同的原始数据源)
 - [x] 下载 Pi 0.5 的 base 权重
 
 ### 2. Benchmark 评估
 - [x] **LIBERO Benchmark** → 96% 成功率 ✅
-- [ ] ManiSkill3 Benchmark（需要微调数据）
+- [x] ManiSkill3 Zero-shot 评估 → 0% (预期内) ✅
+- [ ] ManiSkill3 SFT 后评估（待训练）
 
 ### 3. 仿真任务
-- [ ] 完成 6 个在 ManiSkill 上的仿真任务
-- [ ] 将 Pi 0 接 ManiSkill 的仿真 → 换成 Pi 0.5
+- [x] 完成数据转换流程 (StackCube)
+- [x] 将 Pi 0 接 ManiSkill 的仿真 → 换成 Pi 0.5 配置 ✅
+- [ ] 完成 Pi 0.5 SFT 训练
 - [ ] 完成 Pi 0.5 在 ManiSkill Benchmark 的跑分
 
 ### 4. 架构更改任务
@@ -68,6 +70,20 @@
 - [x] 下载 pi05_droid 模型 (6.8GB)
 - [x] 下载 pi05_libero 模型 (12GB)
 - [x] **LIBERO Benchmark 评估完成** → 96%
+
+#### ManiSkill 集成工作
+- [x] 分析云帆的 caurft 仓库结构和数据转换方案
+- [x] 复制 ManiSkill 相关脚本到我们仓库：
+  - `examples/maniskill/convert_maniskill_data_to_lerobot.py` - 数据转换
+  - `scripts/eval_maniskill.py` - 评估脚本
+  - `src/openpi/policies/libero_policy_no_wrist.py` - 无 wrist camera 策略
+- [x] 添加 Pi0.5 ManiSkill 训练配置到 `config.py`
+- [x] 转换 StackCube 数据 (200条轨迹 → 3.5GB LeRobot 格式)
+- [x] 计算 norm_stats 归一化统计
+- [x] 修改评估脚本支持 HuggingFace checkpoint 格式
+- [x] **Pi0.5 Zero-shot 评估** → 0% 成功率 (预期内，未经训练)
+- [ ] Pi0.5 SFT 训练
+- [ ] Pi0.5 训练后评估
 
 ---
 
