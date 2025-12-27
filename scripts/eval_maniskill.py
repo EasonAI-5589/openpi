@@ -37,8 +37,8 @@ def _find_checkpoint_dir(base_dir: Path, checkpoint_step: Optional[int] = None) 
     base_dir = base_dir.resolve()
 
     def _is_valid_checkpoint(d: Path) -> bool:
-        """Check if directory contains a valid checkpoint (params or HF format)."""
-        return (d / "params").exists() or (d / "model.safetensors").exists()
+        """Check if directory contains a valid checkpoint (params, HF format, or orbax format)."""
+        return (d / "params").exists() or (d / "model.safetensors").exists() or (d / "_METADATA").exists()
 
     # If specific step is requested, look for it
     if checkpoint_step is not None:
