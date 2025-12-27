@@ -449,6 +449,38 @@ python /share/project/yunfan/RL/caurft/openpi/scripts/eval_maniskill.py \
 - [x] **下载 pi05_base 模型** → `checkpoints/pi05_base_hf/` (14GB)
 - [x] **下载 pi05_droid 模型** → `checkpoints/pi05_droid_hf/` (6.8GB)
 - [x] **pi05_base PyTorch 推理测试成功** ✅
+- [x] **下载 pi05_libero 模型** → `checkpoints/pi05_libero/` (12GB, GCS)
+- [x] **LIBERO Benchmark 评估完成** ✅
+
+#### LIBERO Benchmark 评估结果（2025-12-27）
+
+**Task Suite**: `libero_spatial` (10 tasks × 5 trials = 50 episodes)
+
+| 指标 | 结果 |
+|------|------|
+| **总成功率** | **96%** (48/50) |
+| **官方报告** | 98.8% |
+| **评估时间** | 5分26秒 |
+
+**各任务成功率**：
+| Task | 成功率 |
+|------|--------|
+| Task 1-8 | 100% (5/5) |
+| Task 9 | 80% (4/5) |
+| Task 10 | 80% (4/5) |
+
+**运行环境**：
+- Policy Server: `uv run scripts/serve_policy.py --env LIBERO policy:checkpoint --policy.config pi05_libero --policy.dir checkpoints/pi05_libero`
+- Client: `python examples/libero/main.py --args.task-suite-name libero_spatial --args.num-trials-per-task 5`
+- Conda 环境: `libero` (Python 3.8)
+
+**对比 ManiSkill3**：
+| Benchmark | 成功率 | 备注 |
+|-----------|--------|------|
+| LIBERO (libero_spatial) | **96%** | 使用 fine-tuned checkpoint |
+| ManiSkill3 (6 tasks) | 0% | Zero-shot，无 ManiSkill 微调数据 |
+
+**结论**：Pi0.5 在有微调数据的 LIBERO 上表现优异，接近官方报告水平。
 
 #### 推理测试结果（2025-12-27）
 
