@@ -326,6 +326,46 @@ We will collect common issues and their solutions here. If you encounter an issu
 
 This fork includes experimental support for evaluating Pi0.5 models on [ManiSkill3](https://github.com/haosulab/ManiSkill) simulation environments.
 
+### ManiSkill3 Benchmark Tasks
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        ManiSkill3 Benchmark Tasks                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                    云帆 Pi0 Evaluation (6 tasks)                     │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │  PlaceSphere-v1    │ place sphere      │ 11/40 = 27.50%             │   │
+│  │  PickCube-v1       │ pick cube         │  1/40 =  2.50%  ──┐        │   │
+│  │  StackCube-v1      │ stack cube        │ 24/40 = 60.00%  ──┼─ 重叠  │   │
+│  │  PushCube-v1       │ push cube         │ 28/40 = 70.00%  ──┘        │   │
+│  │  PullCube-v1       │ pull cube         │ 35/40 = 87.50%             │   │
+│  │  PullCubeTool-v1   │ pull cube (tool)  │  3/40 =  7.50%             │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                   我们 Pi0.5 Evaluation (6 tasks)                    │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │  PickCube-v1       │ pick cube         │  0/40 =  0.00%  ──┐        │   │
+│  │  StackCube-v1      │ stack cube        │  0/40 =  0.00%  ──┼─ 重叠  │   │
+│  │  PushCube-v1       │ push cube         │  0/40 =  0.00%  ──┘        │   │
+│  │  PegInsertionSide  │ peg insertion     │  0/40 =  0.00%             │   │
+│  │  PlugCharger-v1    │ plug charger      │  0/40 =  0.00%             │   │
+│  │  TurnFaucet-v1     │ turn faucet       │  0/40 =  0.00%             │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         Task Comparison                              │   │
+│  ├─────────────────────────────────────────────────────────────────────┤   │
+│  │  共同任务 (3):  PickCube, StackCube, PushCube                        │   │
+│  │  云帆独有 (3):  PlaceSphere, PullCube, PullCubeTool                  │   │
+│  │  我们独有 (3):  PegInsertionSide, PlugCharger, TurnFaucet            │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
 ### Quick Start
 
 ```bash
