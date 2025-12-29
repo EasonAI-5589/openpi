@@ -165,7 +165,6 @@ bash scripts/run_maniskill_eval.sh --config-name pi0_maniskill_stackcube ...
 ### 待确认
 - [ ] 当前 loss 组成：diffusion loss + a loss + q loss，具体是什么？
 - [ ] 换成 Flow Matching 头后，a loss 和 q loss 怎么调整？
-- [ ] 有没有泰玲的代码可以参考？
 
 ---
 

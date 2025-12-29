@@ -33,7 +33,6 @@
 
 ### 5. 学习准备
 - [ ] 阅读 CRFT 论文（程洪洋推荐）
-- [ ] 熟悉泰玲的代码（基于 CRFT 改进）
 
 ---
 
@@ -82,8 +81,20 @@
 - [x] 计算 norm_stats 归一化统计
 - [x] 修改评估脚本支持 HuggingFace checkpoint 格式
 - [x] **Pi0.5 Zero-shot 评估** → 0% 成功率 (预期内，未经训练)
-- [ ] Pi0.5 SFT 训练
-- [ ] Pi0.5 训练后评估
+- [x] **转换全部 6 个 ManiSkill 任务数据** ✅
+  - StackCube (200 条轨迹)
+  - PickCube (200 条轨迹)
+  - PushCube (200 条轨迹)
+  - PullCube (200 条轨迹)
+  - PlaceSphere (188 条轨迹)
+  - PegInsertionSide (200 条轨迹)
+- [x] **添加全部 6 个任务的 Pi0.5 训练配置** ✅
+- [x] **PickCube Pi0.5 SFT 训练完成** ✅ (2025-12-29)
+  - 30000 步训练完成
+  - Loss: 0.0833 → 0.0045 (下降 95%)
+  - Checkpoint: `checkpoints/pi05_maniskill_pickcube/pickcube_sft_v1/29999`
+- [ ] PickCube 训练后评估
+- [ ] 剩余 5 个任务 SFT 训练
 
 ---
 

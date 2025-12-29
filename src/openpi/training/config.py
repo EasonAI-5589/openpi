@@ -1097,7 +1097,7 @@ _CONFIGS = [
             ),
         ),
         # Load from HuggingFace checkpoint (local path)
-        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_base_hf"),
+        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_base/params"),
     ),
     TrainConfig(
         name="pi05_maniskill_droid",
@@ -1135,7 +1135,8 @@ _CONFIGS = [
             base_config=DataConfig(prompt_from_task=True),
             extra_delta_transform=False,
         ),
-        batch_size=256,
+        batch_size=128,  # Use 128 with fsdp_devices=8
+        fsdp_devices=8,  # Enable FSDP to shard model across 8 GPUs
         lr_schedule=_optimizer.CosineDecaySchedule(
             warmup_steps=10_000,
             peak_lr=5e-5,
@@ -1144,14 +1145,15 @@ _CONFIGS = [
         ),
         optimizer=_optimizer.AdamW(clip_gradient_norm=1.0),
         ema_decay=0.999,
-        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_base_hf"),
+        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_base/params"),
         num_train_steps=30_000,
         save_interval=500,
         keep_period=500,
     ),
+    # Pi0 ManiSkill configs (参考云帆的配置)
     TrainConfig(
-        name="pi05_maniskill_pickcube",
-        model=pi0_config.Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False),
+        name="pi0_maniskill_pickcube",
+        model=pi0_config.Pi0Config(action_horizon=10),  # Pi0, 非 Pi0.5
         data=LeRobotManiskillNoWristDataConfig(
             repo_id="/share/project/guoyichen/maniskill_lerobot/maniskill_pickcube",
             base_config=DataConfig(prompt_from_task=True),
@@ -1166,7 +1168,29 @@ _CONFIGS = [
         ),
         optimizer=_optimizer.AdamW(clip_gradient_norm=1.0),
         ema_decay=0.999,
-        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_base_hf"),
+        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi0_base/params"),
+        num_train_steps=30_000,
+    ),
+    # Pi0.5 ManiSkill configs
+    TrainConfig(
+        name="pi05_maniskill_pickcube",
+        model=pi0_config.Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False),
+        data=LeRobotManiskillNoWristDataConfig(
+            repo_id="/share/project/guoyichen/maniskill_lerobot/maniskill_pickcube",
+            base_config=DataConfig(prompt_from_task=True),
+            extra_delta_transform=False,
+        ),
+        batch_size=128,  # Increased from 64, ~37GB/GPU used, 43GB free
+        fsdp_devices=8,  # Enable FSDP to shard model across 8 GPUs
+        lr_schedule=_optimizer.CosineDecaySchedule(
+            warmup_steps=10_000,
+            peak_lr=5e-5,
+            decay_steps=1_000_000,
+            decay_lr=5e-5,
+        ),
+        optimizer=_optimizer.AdamW(clip_gradient_norm=1.0),
+        ema_decay=0.999,
+        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_base/params"),
         num_train_steps=30_000,
     ),
     TrainConfig(
@@ -1177,7 +1201,8 @@ _CONFIGS = [
             base_config=DataConfig(prompt_from_task=True),
             extra_delta_transform=False,
         ),
-        batch_size=16,
+        batch_size=128,  # Use 128 with fsdp_devices=8
+        fsdp_devices=8,  # Enable FSDP to shard model across 8 GPUs
         lr_schedule=_optimizer.CosineDecaySchedule(
             warmup_steps=10_000,
             peak_lr=5e-5,
@@ -1186,7 +1211,70 @@ _CONFIGS = [
         ),
         optimizer=_optimizer.AdamW(clip_gradient_norm=1.0),
         ema_decay=0.999,
-        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_base_hf"),
+        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_base/params"),
+        num_train_steps=20_000,
+    ),
+    TrainConfig(
+        name="pi05_maniskill_pullcube",
+        model=pi0_config.Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False),
+        data=LeRobotManiskillNoWristDataConfig(
+            repo_id="/share/project/guoyichen/maniskill_lerobot/maniskill_pullcube",
+            base_config=DataConfig(prompt_from_task=True),
+            extra_delta_transform=False,
+        ),
+        batch_size=128,  # Use 128 with fsdp_devices=8
+        fsdp_devices=8,  # Enable FSDP to shard model across 8 GPUs
+        lr_schedule=_optimizer.CosineDecaySchedule(
+            warmup_steps=10_000,
+            peak_lr=5e-5,
+            decay_steps=1_000_000,
+            decay_lr=5e-5,
+        ),
+        optimizer=_optimizer.AdamW(clip_gradient_norm=1.0),
+        ema_decay=0.999,
+        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_base/params"),
+        num_train_steps=20_000,
+    ),
+    TrainConfig(
+        name="pi05_maniskill_placesphere",
+        model=pi0_config.Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False),
+        data=LeRobotManiskillNoWristDataConfig(
+            repo_id="/share/project/guoyichen/maniskill_lerobot/maniskill_placesphere",
+            base_config=DataConfig(prompt_from_task=True),
+            extra_delta_transform=False,
+        ),
+        batch_size=128,  # Use 128 with fsdp_devices=8
+        fsdp_devices=8,  # Enable FSDP to shard model across 8 GPUs
+        lr_schedule=_optimizer.CosineDecaySchedule(
+            warmup_steps=10_000,
+            peak_lr=5e-5,
+            decay_steps=1_000_000,
+            decay_lr=5e-5,
+        ),
+        optimizer=_optimizer.AdamW(clip_gradient_norm=1.0),
+        ema_decay=0.999,
+        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_base/params"),
+        num_train_steps=30_000,
+    ),
+    TrainConfig(
+        name="pi05_maniskill_peginsertionside",
+        model=pi0_config.Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False),
+        data=LeRobotManiskillNoWristDataConfig(
+            repo_id="/share/project/guoyichen/maniskill_lerobot/maniskill_peginsertionside",
+            base_config=DataConfig(prompt_from_task=True),
+            extra_delta_transform=False,
+        ),
+        batch_size=128,  # Use 128 with fsdp_devices=8
+        fsdp_devices=8,  # Enable FSDP to shard model across 8 GPUs
+        lr_schedule=_optimizer.CosineDecaySchedule(
+            warmup_steps=10_000,
+            peak_lr=5e-5,
+            decay_steps=1_000_000,
+            decay_lr=5e-5,
+        ),
+        optimizer=_optimizer.AdamW(clip_gradient_norm=1.0),
+        ema_decay=0.999,
+        weight_loader=weight_loaders.CheckpointWeightLoader("checkpoints/pi05_base/params"),
         num_train_steps=20_000,
     ),
     # RoboArena & PolaRiS configs.
